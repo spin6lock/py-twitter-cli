@@ -1,0 +1,4 @@
+*.sw*
+*.json
+config.py
+__pycache__/*
