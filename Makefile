@@ -1,6 +1,6 @@
 .PHONY : all
-all: update d
+all: update
 update:
-	proxychains4 python3 main.py
+	proxychains4 python3 main.py |less
 d: #display
 	./display.sh

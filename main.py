@@ -12,3 +12,6 @@ with open('timeline.json', 'w+') as f:
     for tweet in timeline:
         f.write(json.dumps(tweet._json))
         f.write('\n')
+for tweet in timeline:
+    print("-----------------")
+    print("@{}: {} via: https://twitter.com/{}/status/{}".format(tweet.user.screen_name, tweet.text, tweet.user.screen_name, tweet.id_str))
