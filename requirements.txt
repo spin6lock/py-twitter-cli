@@ -1,2 +1,4 @@
 python-twitter
 colorama
+grequests
+Pillow
