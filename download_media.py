@@ -25,6 +25,8 @@ def download_one_url(r, path):
     if r.status_code != 200:
         print(f"Err getting:{url}")
         return False
+    if os.path.exists(path): #不用重复下载了
+        return True
     with open(path, "wb") as f:
         f.write(r.content)
     return True
@@ -44,7 +46,7 @@ def download_media(id_urls):
             url_paths[url] = path
     urls = url_paths.keys()
     bar = Bar("Progress", max=len(urls), suffix="%(percent)d%% %(elapsed_td)s")
-    rs = (grequests.get(u, stream=False) for u in urls)
+    rs = (grequests.get(u, stream=False, timeout = 10) for u in urls)
     for resp in grequests.imap(rs, size = 10):
         bar.next()
         if resp:
