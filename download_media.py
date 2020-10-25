@@ -3,6 +3,7 @@ from class_proxy import wrap
 import json
 import grequests
 import os
+from progress.bar import IncrementalBar as Bar
 
 def try_mkdir(path):
     try:
@@ -41,9 +42,16 @@ def download_media(id_urls):
         for i, url in enumerate(urls, 1):
             path = os.path.join(parent_path, str(i))
             url_paths[url] = path
-    rs = (grequests.get(u, stream=False) for u in url_paths.keys())
-    for resp in grequests.map(rs, size = 5):
-        download_one_url(resp, url_paths[resp.url])
+    urls = url_paths.keys()
+    bar = Bar("Progress", max=len(urls), suffix="%(percent)d%% %(elapsed_td)s")
+    rs = (grequests.get(u, stream=False) for u in urls)
+    for resp in grequests.imap(rs, size = 10):
+        bar.next()
+        if resp:
+            download_one_url(resp, url_paths[resp.url])
+        else:
+            print("download error")
+    bar.finish()
 
 def collect_and_download(timeline):
     id_urls = collect_media_url(timeline)

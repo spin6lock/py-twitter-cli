@@ -19,8 +19,11 @@ def display_one_tweet_image(tweet):
         url = media.media_url_https
         postfix = url[url.rfind("."):]
         path = os.path.join("images", tweet.id_str+postfix)
-    with open(path, "rb") as f:
-        imgcat(f.read(), height = config.image_height)
+    try:
+        with open(path, "rb") as f:
+            imgcat(f.read(), height = config.image_height)
+    except FileNotFoundError as err:
+        print(err)
 
 def display(timeline):
     for tweet in timeline:

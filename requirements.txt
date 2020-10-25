@@ -2,3 +2,4 @@ python-twitter
 colorama
 grequests
 Pillow
+progress
