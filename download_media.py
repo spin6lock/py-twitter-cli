@@ -5,6 +5,8 @@ import grequests
 import os
 from progress.bar import IncrementalBar as Bar
 import utils
+import time
+import threading
 
 def try_mkdir(path):
     try:
@@ -33,6 +35,17 @@ def download_one_url(r, path):
         f.write(r.content)
     return True
 
+def update_bar(bar):
+    while True:
+        time.sleep(1)
+        bar.update()
+        if bar.is_finish:
+            break
+
+def start_multithread(bar):
+    t = threading.Thread(target=update_bar, args=(bar,))
+    t.start()
+
 def download_media(id_urls):
     url_paths = {}
     for tweet_id, urls in id_urls.items():
@@ -48,7 +61,9 @@ def download_media(id_urls):
             url_paths[url] = path
     urls = url_paths.keys()
     bar = Bar("Progress", max=len(urls), suffix="%(percent)d%% %(elapsed_td)s")
+    bar.is_finish = False
     rs = (grequests.get(u, stream=False, timeout = 10) for u in urls)
+    start_multithread(bar)
     for resp in grequests.imap(rs, size = 10):
         bar.next()
         if resp:
@@ -56,6 +71,7 @@ def download_media(id_urls):
         else:
             print("download error")
     bar.finish()
+    bar.is_finish = True
 
 def collect_and_download(timeline):
     id_urls = collect_media_url(timeline)
