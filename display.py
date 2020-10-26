@@ -5,6 +5,7 @@ from class_proxy import wrap
 from imgcat import imgcat
 import os
 import config
+import utils
 
 def display_one_tweet_image(tweet):
     path = None
@@ -18,7 +19,8 @@ def display_one_tweet_image(tweet):
         media = tweet.entities.media[0]
         url = media.media_url_https
         postfix = url[url.rfind("."):]
-        path = os.path.join("images", tweet.id_str+postfix)
+        image_id = utils.gen_image_id(tweet)
+        path = os.path.join("images", image_id+postfix)
     try:
         with open(path, "rb") as f:
             imgcat(f.read(), height = config.image_height)

@@ -4,6 +4,7 @@ import json
 import grequests
 import os
 from progress.bar import IncrementalBar as Bar
+import utils
 
 def try_mkdir(path):
     try:
@@ -16,7 +17,8 @@ def collect_media_url(timeline):
     ret = {}
     for tweet in timeline:
         if tweet.entities.media:
-            ret[tweet.id_str] = [media.media_url_https for media in tweet.entities.media]
+            tweet_id = utils.gen_image_id(tweet)
+            ret[tweet_id] = [media.media_url_https for media in tweet.entities.media]
     return ret
 
 def download_one_url(r, path):
@@ -25,7 +27,7 @@ def download_one_url(r, path):
     if r.status_code != 200:
         print(f"Err getting:{url}")
         return False
-    if os.path.exists(path): #不用重复下载了
+    if os.path.exists(path): #if file exist, skip
         return True
     with open(path, "wb") as f:
         f.write(r.content)
