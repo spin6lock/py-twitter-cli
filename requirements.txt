@@ -1,6 +1,6 @@
 python-twitter
 colorama
-grequests
 Pillow
 progress
 imgcat
+aiohttp_requests

@@ -1,12 +1,12 @@
 #encoding:utf8
 from class_proxy import wrap
 import json
-import grequests
 import os
 from progress.bar import IncrementalBar as Bar
 import utils
 import time
-import threading
+import asyncio
+from aiohttp_requests import requests
 
 def try_mkdir(path):
     try:
@@ -23,30 +23,30 @@ def collect_media_url(timeline):
             ret[tweet_id] = [media.media_url_https for media in tweet.entities.media]
     return ret
 
-def download_one_url(r, path):
-    url = r.url
+async def download_one_url(url, path, bar):
+    r = await requests.get(url, timeout = 10)
     path = path + url[url.rfind("."):]
-    if r.status_code != 200:
+    if r.status != 200:
         print(f"Err getting:{url}")
         return False
     if os.path.exists(path): #if file exist, skip
+        bar.next()
         return True
+    content = await r.read()
     with open(path, "wb") as f:
-        f.write(r.content)
+        f.write(content)
+    bar.next()
     return True
 
-def update_bar(bar):
+async def update_bar(bar):
     while True:
-        time.sleep(1)
+        await asyncio.sleep(1)
         bar.update()
-        if bar.is_finish:
+        if bar.progress >= 1.0:
+            bar.finish()
             break
 
-def start_multithread(bar):
-    t = threading.Thread(target=update_bar, args=(bar,))
-    t.start()
-
-def download_media(id_urls):
+async def download_media(id_urls):
     url_paths = {}
     for tweet_id, urls in id_urls.items():
         if len(urls) == 1:
@@ -61,22 +61,15 @@ def download_media(id_urls):
             url_paths[url] = path
     urls = url_paths.keys()
     bar = Bar("Progress", max=len(urls), suffix="%(percent)d%% %(elapsed_td)s")
-    bar.is_finish = False
-    rs = (grequests.get(u, stream=False, timeout = 10) for u in urls)
-    start_multithread(bar)
-    for resp in grequests.imap(rs, size = 10):
-        bar.next()
-        if resp:
-            download_one_url(resp, url_paths[resp.url])
-        else:
-            print("download error")
-    bar.finish()
-    bar.is_finish = True
+    tasks = [download_one_url(u, url_paths[u], bar) for u in urls]
+    tasks.append(update_bar(bar))
+    await asyncio.gather(*tasks)
 
 def collect_and_download(timeline):
     id_urls = collect_media_url(timeline)
     try_mkdir("images")
-    download_media(id_urls)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(download_media(id_urls))
 
 def standalone():
     timeline = []
@@ -85,8 +78,7 @@ def standalone():
             tweet = json.loads(line)
             tweet = wrap(tweet)
             timeline.append(tweet)
-    collect_and_download(timeline)
-    
+    collect_and_download(timeline) 
+
 if __name__ == "__main__":
     standalone()
-
