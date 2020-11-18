@@ -1,5 +1,4 @@
 #encoding:utf8
-import grequests
 import twitter
 import json
 import config
