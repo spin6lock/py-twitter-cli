@@ -4,7 +4,7 @@ import twitter
 import json
 import config
 import download_media
-import display
+import gen_webpage
 import class_proxy
 
 api = twitter.Api(consumer_key=config.consumer_key,
@@ -20,4 +20,4 @@ with open('timeline.json', 'w+') as f:
         f.write('\n')
 
 download_media.collect_and_download(new_timeline)
-display.display(new_timeline)
+gen_webpage.display(new_timeline)
