@@ -28,7 +28,7 @@ def display(timeline):
         for tweet in timeline:
             fout.write("<tr><td>")
             link = f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id_str}"
-            fout.write(f'@{tweet.user.screen_name}: {tweet.text} via: <a href="{link}">{link}</a>')
+            fout.write(f'<a href="https://twitter.com/{tweet.user.screen_name}">@{tweet.user.screen_name}</a>: {tweet.text} via: <a href="{link}">{link}</a>')
             if tweet.entities.media:
                 display_one_tweet_image(tweet, fout)
             fout.write("</tr></td>")
