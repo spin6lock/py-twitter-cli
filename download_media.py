@@ -18,7 +18,11 @@ def try_mkdir(path):
 def collect_media_url(timeline):
     ret = {}
     for tweet in timeline:
-        if tweet.entities.media:
+        if utils.is_contains_multiple_media(tweet):
+            medias = tweet.extended_entities.media
+            tweet_id = utils.gen_image_id(tweet)
+            ret[tweet_id] = [media.media_url_https for media in medias]
+        elif tweet.entities.media:
             tweet_id = utils.gen_image_id(tweet)
             ret[tweet_id] = [media.media_url_https for media in tweet.entities.media]
     return ret

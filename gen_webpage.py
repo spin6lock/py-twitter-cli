@@ -7,19 +7,22 @@ import utils
 
 def display_one_tweet_image(tweet, fout):
     path = None
-    if len(tweet.entities.media) > 1:
-        parent_path = os.path.join("images", tweet.id_str)
-        for i, media in enumerate(tweet.entities.media, 1):
+    if utils.is_contains_multiple_media(tweet):
+        medias = tweet.extended_entities.media
+        tweet_id = utils.gen_image_id(tweet)
+        parent_path = os.path.join("images", tweet_id)
+        for i, media in enumerate(medias, 1):
             url = media.media_url_https
             postfix = url[url.rfind("."):]
             path = os.path.join(parent_path, str(i) + postfix)
+            fout.write('<img src={} style="height:{}">'.format(path, config.image_height))
     else:
         media = tweet.entities.media[0]
         url = media.media_url_https
         postfix = url[url.rfind("."):]
         image_id = utils.gen_image_id(tweet)
         path = os.path.join("images", image_id+postfix)
-    fout.write('<img src={} style="height:{}">'.format(path, config.image_height))
+        fout.write('<img src={} style="height:{}">'.format(path, config.image_height))
 
 def display(timeline):
     filename = 'timeline.html'
