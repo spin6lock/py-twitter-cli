@@ -9,8 +9,9 @@ import class_proxy
 api = twitter.Api(consumer_key=config.consumer_key,
         consumer_secret=config.consumer_secret,
         access_token_key=config.access_token_key,
-        access_token_secret=config.access_token_secret)
-timeline = api.GetHomeTimeline(count=config.count)
+        access_token_secret=config.access_token_secret,
+        tweet_mode='extended')
+timeline = api.GetHomeTimeline(count=config.count, )
 new_timeline = []
 with open('timeline.json', 'w+') as f:
     for tweet in timeline:

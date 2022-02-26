@@ -5,6 +5,7 @@ import os
 import config
 import utils
 import subprocess
+import re
 
 def display_one_tweet_image(tweet, fout):
     path = None
@@ -25,6 +26,24 @@ def display_one_tweet_image(tweet, fout):
         path = os.path.join("images", image_id+postfix)
         fout.write('<img src={} style="height:{}">'.format(path, config.image_height))
 
+
+pattern = re.compile("https:\/\/t\.co\/[a-zA-Z0-9]+")
+def add_link_for_text(tweet):
+    # media url, don't add link
+    if tweet.entities.media:
+        return tweet.text or ''
+    else:
+        text = tweet.full_text
+        if tweet.retweeted_status:
+            text = tweet.retweeted_status.full_text
+        urls = pattern.findall(str(text))
+        if len(urls) > 0:
+            text = text.replace(urls[0], '')
+            for url in urls[1:]:
+                text = text.replace(url, f'<a href="{url}">{url}</a>')
+        return text
+
+
 def display(timeline):
     filename = 'timeline.html'
     with open(filename, "w") as fout:
@@ -32,7 +51,8 @@ def display(timeline):
         for tweet in timeline:
             fout.write("<tr><td>")
             link = f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id_str}"
-            fout.write(f'<a href="https://twitter.com/{tweet.user.screen_name}">@{tweet.user.screen_name}</a>: {tweet.text} <a href="{link}">source</a>')
+            text = add_link_for_text(tweet)
+            fout.write(f'<a href="https://twitter.com/{tweet.user.screen_name}">@{tweet.user.screen_name}</a>: {text} <a href="{link}">source</a>')
             if tweet.entities.media:
                 display_one_tweet_image(tweet, fout)
             fout.write("</tr></td>")
