@@ -27,7 +27,7 @@ def display_one_tweet_image(tweet, fout):
 def display(timeline):
     filename = 'timeline.html'
     with open(filename, "w") as fout:
-        fout.write("<table border='1'>")
+        fout.write("<table border='1' style='width:800px;table-layout:fixed;'>")
         for tweet in timeline:
             fout.write("<tr><td>")
             link = f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id_str}"
