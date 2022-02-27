@@ -24,7 +24,7 @@ def display_one_tweet_image(tweet, fout):
         postfix = url[url.rfind("."):]
         image_id = utils.gen_image_id(tweet)
         path = os.path.join("images", image_id+postfix)
-        fout.write('<img src={} style="height:{}">'.format(path, config.image_height))
+        fout.write('<a href={}><img src={} style="height:{}"></a>'.format(path, path, config.image_height))
 
 
 pattern = re.compile("https:\/\/t\.co\/[a-zA-Z0-9]+")
