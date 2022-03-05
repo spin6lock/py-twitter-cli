@@ -10,7 +10,7 @@ import re
 
 img_style = f"height:{config.image_height}"
 def img_gen(src, style=img_style):
-    return f'<img src={src} style="{style}" >'
+    return f'<a href="{src}" target="_blank" ><img src="{src}" style="{style}"></a>'
 
 
 def ahref_gen(text, link):
@@ -35,7 +35,7 @@ def display_one_tweet_image(tweet, fout):
         image_id = utils.gen_image_id(tweet)
         path = os.path.join("images", image_id+postfix)
         image_tag = img_gen(path)
-        fout.write(ahref_gen(image_tag, path))
+        fout.write(image_tag)
 
 
 def get_text_from(tweet):
