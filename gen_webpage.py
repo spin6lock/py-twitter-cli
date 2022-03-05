@@ -27,11 +27,18 @@ def display_one_tweet_image(tweet, fout):
         fout.write('<a href={}><img src={} style="height:{}"></a>'.format(path, path, config.image_height))
 
 
+def get_text_from(tweet):
+    text = tweet.full_text
+    if tweet.quoted_status:
+        text = text + "\tQuote:" + tweet.quoted_status.full_text
+    if tweet.retweeted_status:
+        text = text + "\tRT:" + get_text_from(tweet.retweeted_status)
+    return text
+
+
 pattern = re.compile("https:\/\/t\.co\/[a-zA-Z0-9]+")
 def add_link_for_text(tweet):
-    text = tweet.full_text
-    if tweet.retweeted_status:
-        text = tweet.retweeted_status.full_text
+    text = get_text_from(tweet)
     urls = pattern.findall(str(text))
     if len(urls) > 0:
         text = text.replace(urls[0], '')

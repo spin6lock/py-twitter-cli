@@ -1,5 +1,7 @@
 #encoding:utf8
 #credited for: https://stackoverflow.com/questions/1305532/convert-nested-python-dict-to-object @JayD3e
+import pprint
+pformat = pprint.pformat
 
 class DictProxy(object):
     def __init__(self, obj):
@@ -17,6 +19,9 @@ class DictProxy(object):
             except KeyError:
                 #raise AttributeError(key)
                 return None
+
+    def __repr__(self):
+        return pformat(self.obj)
 
     # you probably also want to proxy important list properties along like
     # items(), iteritems() and __len__
