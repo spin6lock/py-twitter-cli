@@ -29,19 +29,15 @@ def display_one_tweet_image(tweet, fout):
 
 pattern = re.compile("https:\/\/t\.co\/[a-zA-Z0-9]+")
 def add_link_for_text(tweet):
-    # media url, don't add link
-    if tweet.entities.media:
-        return tweet.text or ''
-    else:
-        text = tweet.full_text
-        if tweet.retweeted_status:
-            text = tweet.retweeted_status.full_text
-        urls = pattern.findall(str(text))
-        if len(urls) > 0:
-            text = text.replace(urls[0], '')
-            for url in urls[1:]:
-                text = text.replace(url, f'<a href="{url}">{url}</a>')
-        return text
+    text = tweet.full_text
+    if tweet.retweeted_status:
+        text = tweet.retweeted_status.full_text
+    urls = pattern.findall(str(text))
+    if len(urls) > 0:
+        text = text.replace(urls[0], '')
+        for url in urls[1:]:
+            text = text.replace(url, f'<a href="{url}">{url}</a>')
+    return text
 
 
 def display(timeline):
